@@ -14,8 +14,8 @@ public class CardViewHolder extends RecyclerView.ViewHolder {
 
     public CardViewHolder(final View itemView) {
         super(itemView);
-        artistName = (TextView) itemView.findViewById(R.id.artist_name);
-        songTitle = (TextView) itemView.findViewById(R.id.song_title);
-        albumArt = (ImageView) itemView.findViewById(R.id.album_art_view);
+        artistName = itemView.findViewById(R.id.artist_name);
+        songTitle = itemView.findViewById(R.id.song_title);
+        albumArt = itemView.findViewById(R.id.album_art_view);
     }
 }

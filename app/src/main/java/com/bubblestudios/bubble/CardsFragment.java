@@ -15,26 +15,26 @@ import android.view.ViewGroup;
 import com.bumptech.glide.Glide;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
+import com.firebase.ui.database.SnapshotParser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
+import com.yuyakaido.android.cardstackview.CardStackLayoutManager;
+import com.yuyakaido.android.cardstackview.CardStackListener;
+import com.yuyakaido.android.cardstackview.CardStackView;
+import com.yuyakaido.android.cardstackview.Direction;
+import com.yuyakaido.android.cardstackview.StackFrom;
 
-
-/**
- * A simple {@link Fragment} subclass.
- * Activities that contain this fragment must implement the
- * {@link CardsFragment.OnFragmentInteractionListener} interface
- * to handle interaction events.
- * Use the {@link CardsFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
-public class CardsFragment extends Fragment {
+public class CardsFragment extends Fragment implements CardStackListener {
 
     private OnFragmentInteractionListener mListener;
+    private CardStackAdapter adapter;
 
     public CardsFragment() {
-        // Required empty public constructor
     }
 
     public static CardsFragment newInstance(String param1, String param2) {
@@ -64,36 +64,14 @@ public class CardsFragment extends Fragment {
         Query query = FirebaseDatabase.getInstance().getReference().child("snippets");
         FirebaseRecyclerOptions<Snippet> options = new FirebaseRecyclerOptions.Builder<Snippet>().setQuery(query, Snippet.class).build();
 
-        FirebaseRecyclerAdapter adapter = new FirebaseRecyclerAdapter<Snippet, CardViewHolder>(options) {
-            @Override
-            protected void onBindViewHolder(CardViewHolder holder, int position, @NonNull Snippet snippet) {
-                holder.artistName.setText(snippet.getArtist());
-                holder.songTitle.setText(snippet.getTitle());
-                Glide.with(getContext()).load(albumArtRef.child(snippet.getAlbumArt())).into(holder.albumArt);
-                Log.d("Read List", "onBindViewHolder: " + snippet.getArtist());
-            }
+        adapter = new CardStackAdapter(options, albumArtRef);
+        CardStackView cardStackView = view.findViewById(R.id.card_view);
+        cardStackView.setAdapter(adapter);
+        CardStackLayoutManager layoutManager = new CardStackLayoutManager(getContext(), this);
+        layoutManager.setStackFrom(StackFrom.Top);
+        cardStackView.setLayoutManager(layoutManager);
 
-            @NonNull
-            @Override
-            public CardViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
-                View view = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.card_layout, viewGroup, false);
-
-                return new CardViewHolder(view);
-            }
-        };
-
-        RecyclerView cardView = (RecyclerView) view.findViewById(R.id.card_view);
-        cardView.setAdapter(adapter);
-        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false);
-        cardView.setLayoutManager(layoutManager);
         return view;
-    }
-
-    // TODO: Rename method, update argument and hook method into UI event
-    public void onButtonPressed(Uri uri) {
-        if (mListener != null) {
-            mListener.onFragmentInteraction(uri);
-        }
     }
 
     @Override
@@ -113,16 +91,48 @@ public class CardsFragment extends Fragment {
         mListener = null;
     }
 
-    /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     * <p>
-     * See the Android Training lesson <a href=
-     * "http://developer.android.com/training/basics/fragments/communicating.html"
-     * >Communicating with Other Fragments</a> for more information.
-     */
+    @Override
+    public void onStart() {
+        super.onStart();
+        adapter.startListening();
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        adapter.stopListening();
+    }
+
+    @Override
+    public void onCardDragging(Direction direction, float ratio) {
+
+    }
+
+    @Override
+    public void onCardSwiped(Direction direction) {
+
+    }
+
+    @Override
+    public void onCardRewound() {
+
+    }
+
+    @Override
+    public void onCardCanceled() {
+
+    }
+
+    @Override
+    public void onCardAppeared(View view, int position) {
+
+    }
+
+    @Override
+    public void onCardDisappeared(View view, int position) {
+
+    }
+
     public interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
         void onFragmentInteraction(Uri uri);
