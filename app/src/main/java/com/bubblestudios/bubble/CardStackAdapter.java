@@ -2,6 +2,7 @@ package com.bubblestudios.bubble;
 
 import android.net.Uri;
 import android.support.annotation.NonNull;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,7 +14,6 @@ import com.firebase.ui.database.FirebaseRecyclerOptions;
 import com.google.android.exoplayer2.SimpleExoPlayer;
 import com.google.android.exoplayer2.source.ExtractorMediaSource;
 import com.google.android.exoplayer2.source.MediaSource;
-import com.google.android.exoplayer2.ui.PlayerView;
 import com.google.android.exoplayer2.upstream.DataSource;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.storage.StorageReference;
@@ -24,14 +24,17 @@ public class CardStackAdapter extends FirebaseRecyclerAdapter<Snippet, CardViewH
     private StorageReference snippetRef;
     private SimpleExoPlayer exoPlayer;
     private DataSource.Factory dataSourceFactory;
+    private CardsFragment cardsFragment;
+    private int firstLoad = 0;
 
 
-    public CardStackAdapter(@NonNull FirebaseRecyclerOptions options, StorageReference albumArtRef, StorageReference snippetRef, SimpleExoPlayer exoPlayer, DataSource.Factory dataSourceFactory) {
+    public CardStackAdapter(@NonNull FirebaseRecyclerOptions options, StorageReference albumArtRef, StorageReference snippetRef, SimpleExoPlayer exoPlayer, DataSource.Factory dataSourceFactory, CardsFragment cardsFragment) {
         super(options);
         this.albumArtRef = albumArtRef;
         this.snippetRef = snippetRef;
         this.exoPlayer = exoPlayer;
         this.dataSourceFactory = dataSourceFactory;
+        this.cardsFragment = cardsFragment;
     }
 
     @Override
@@ -45,6 +48,11 @@ public class CardStackAdapter extends FirebaseRecyclerAdapter<Snippet, CardViewH
             public void onSuccess(Uri uri) {
                 MediaSource audioSource = new ExtractorMediaSource.Factory(dataSourceFactory).createMediaSource(uri);
                 holder.audioSource = audioSource;
+
+                if((firstLoad == 0) && (position == 0)) {
+                    cardsFragment.firstPlay();
+                    firstLoad = 1;
+                }
             }
         });
 

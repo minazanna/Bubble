@@ -11,6 +11,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 
 import com.bumptech.glide.Glide;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
@@ -85,11 +86,20 @@ public class CardsFragment extends Fragment implements CardStackListener {
         Query query = FirebaseDatabase.getInstance().getReference().child("snippets");
         FirebaseRecyclerOptions<Snippet> options = new FirebaseRecyclerOptions.Builder<Snippet>().setQuery(query, Snippet.class).build();
 
-        adapter = new CardStackAdapter(options, albumArtRef, snippetRef, exoPlayer, dataSourceFactory);
+        adapter = new CardStackAdapter(options, albumArtRef, snippetRef, exoPlayer, dataSourceFactory, this);
         cardStackView = view.findViewById(R.id.card_view);
         cardStackView.setAdapter(adapter);
         CardStackLayoutManager layoutManager = new CardStackLayoutManager(getContext(), this);
         cardStackView.setLayoutManager(layoutManager);
+
+        final Button pausePlayButton = view.findViewById(R.id.pause_play_button);
+        pausePlayButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                exoPlayer.setPlayWhenReady(!exoPlayer.getPlayWhenReady());
+            }
+        });
+
         return view;
     }
 
@@ -114,6 +124,13 @@ public class CardsFragment extends Fragment implements CardStackListener {
     public void onStart() {
         super.onStart();
         adapter.startListening();
+    }
+
+    public void firstPlay() {
+        CardViewHolder viewHolder = (CardViewHolder) cardStackView.findViewHolderForAdapterPosition(0);
+        exoPlayer.prepare(viewHolder.audioSource);
+        playerView.setPlayer(exoPlayer);
+        exoPlayer.setPlayWhenReady(true);
     }
 
     @Override
