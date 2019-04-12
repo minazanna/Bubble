@@ -5,12 +5,16 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.google.android.exoplayer2.source.MediaSource;
+import com.google.android.exoplayer2.ui.PlayerView;
+
 import org.w3c.dom.Text;
 
 public class CardViewHolder extends RecyclerView.ViewHolder {
     public TextView artistName;
     public TextView songTitle;
     public ImageView albumArt;
+    public MediaSource audioSource;
 
     public CardViewHolder(final View itemView) {
         super(itemView);

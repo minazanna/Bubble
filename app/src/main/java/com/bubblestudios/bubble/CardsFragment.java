@@ -16,6 +16,17 @@ import com.bumptech.glide.Glide;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
 import com.firebase.ui.database.SnapshotParser;
+import com.google.android.exoplayer2.ExoPlayerFactory;
+import com.google.android.exoplayer2.Player;
+import com.google.android.exoplayer2.SimpleExoPlayer;
+import com.google.android.exoplayer2.source.ConcatenatingMediaSource;
+import com.google.android.exoplayer2.source.ExtractorMediaSource;
+import com.google.android.exoplayer2.source.MediaSource;
+import com.google.android.exoplayer2.ui.PlayerView;
+import com.google.android.exoplayer2.upstream.DataSource;
+import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
+import com.google.android.exoplayer2.util.Util;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
@@ -33,6 +44,10 @@ public class CardsFragment extends Fragment implements CardStackListener {
 
     private OnFragmentInteractionListener mListener;
     private CardStackAdapter adapter;
+    private SimpleExoPlayer exoPlayer;
+    private DataSource.Factory dataSourceFactory;
+    private PlayerView playerView;
+    private CardStackView cardStackView;
 
     public CardsFragment() {
     }
@@ -60,17 +75,21 @@ public class CardsFragment extends Fragment implements CardStackListener {
         FirebaseStorage storage = FirebaseStorage.getInstance();
         StorageReference storageRef = storage.getReference();
         final StorageReference albumArtRef = storageRef.child("AlbumArt");
+        final StorageReference snippetRef = storageRef.child("Snippets");
+
+        playerView = view.findViewById(R.id.player_view);
+        exoPlayer = ExoPlayerFactory.newSimpleInstance(getContext());
+        dataSourceFactory = new DefaultDataSourceFactory(getContext(), Util.getUserAgent(getContext(), "Bubble"));
+        playerView.setPlayer(exoPlayer);
 
         Query query = FirebaseDatabase.getInstance().getReference().child("snippets");
         FirebaseRecyclerOptions<Snippet> options = new FirebaseRecyclerOptions.Builder<Snippet>().setQuery(query, Snippet.class).build();
 
-        adapter = new CardStackAdapter(options, albumArtRef);
-        CardStackView cardStackView = view.findViewById(R.id.card_view);
+        adapter = new CardStackAdapter(options, albumArtRef, snippetRef, exoPlayer, dataSourceFactory);
+        cardStackView = view.findViewById(R.id.card_view);
         cardStackView.setAdapter(adapter);
         CardStackLayoutManager layoutManager = new CardStackLayoutManager(getContext(), this);
-        layoutManager.setStackFrom(StackFrom.Top);
         cardStackView.setLayoutManager(layoutManager);
-
         return view;
     }
 
@@ -101,6 +120,7 @@ public class CardsFragment extends Fragment implements CardStackListener {
     public void onStop() {
         super.onStop();
         adapter.stopListening();
+        exoPlayer.setPlayWhenReady(false);
     }
 
     @Override
@@ -125,12 +145,17 @@ public class CardsFragment extends Fragment implements CardStackListener {
 
     @Override
     public void onCardAppeared(View view, int position) {
-
+        Log.d("appear", "onCardAppeared: " + position);
+        CardViewHolder viewHolder = (CardViewHolder) cardStackView.findViewHolderForAdapterPosition(position);
+        exoPlayer.prepare(viewHolder.audioSource);
+        playerView.setPlayer(exoPlayer);
+        exoPlayer.setPlayWhenReady(true);
     }
 
     @Override
     public void onCardDisappeared(View view, int position) {
-
+        exoPlayer.setPlayWhenReady(false);
+        Log.d("disappear", "onCardDisappeared: " + position);
     }
 
     public interface OnFragmentInteractionListener {
