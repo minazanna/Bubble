@@ -3,4 +3,23 @@
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="upload">Upload</string>
+    <string name="submit">Submit</string>
+    <string name="like">Like</string>
+    <string name="dislike">Dislike</string>
+    <string name="pause_play">Pause/Play</string>
+    <string name="song_title">Song Title</string>
+    <string name="artist_name">Artist Name</string>
+    <string name="choose_album_art">Choose Album Art</string>
+    <string name="choose_snippet">Choose Song Snippet</string>
+    <string name="uploading">Uploading</string>
+    <string name="upload_failed">Upload Failed</string>
+    <string name="upload_successful">Upload Successful</string>
+
+    <string name="settings">Settings</string>
+
+    <string-array name="song_genres">
+        <item></item>
+    </string-array>
+
 </resources>
