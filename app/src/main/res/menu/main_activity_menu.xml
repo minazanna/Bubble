@@ -4,7 +4,7 @@
     <item
         android:id="@+id/menu_settings_button"
         android:title="@string/settings"
-        app:showAsAction="ifRoom"/>
+        app:showAsAction="never"/>
     <item
         android:id="@+id/menu_upload_button"
         android:title="@string/upload"

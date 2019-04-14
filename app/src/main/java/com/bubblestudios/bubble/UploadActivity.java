@@ -18,6 +18,8 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
@@ -30,7 +32,7 @@ public class UploadActivity extends AppCompatActivity {
     private Uri snippetFilePath;
     private FirebaseStorage storage;
     private StorageReference storageReference;
-    private DatabaseReference database;
+    private FirebaseFirestore db;
     private Button uploadAlbumArtButton, uploadSnippetButton, chooseAlbumArtButton, chooseSnippetButton;
     private EditText songTitleEditText, artistNameEditText;
     private String albumArtFileName, snippetFileName;
@@ -42,7 +44,7 @@ public class UploadActivity extends AppCompatActivity {
 
         storage = FirebaseStorage.getInstance();
         storageReference = storage.getReference();
-        database = FirebaseDatabase.getInstance().getReference();
+        db = FirebaseFirestore.getInstance();
 
         songTitleEditText = findViewById(R.id.song_title_editText);
         artistNameEditText = findViewById(R.id.artist_name_editText);
@@ -82,10 +84,10 @@ public class UploadActivity extends AppCompatActivity {
                 String songTitle = songTitleEditText.getText().toString();
                 String artistName = artistNameEditText.getText().toString();
                 Snippet snippet = new Snippet(songTitle, artistName, snippetFileName, albumArtFileName);
-                DatabaseReference snippetsRef = database.child("snippets").push();
-                snippetsRef.setValue(snippet).addOnSuccessListener(new OnSuccessListener<Void>() {
+
+                db.collection("snippets").add(snippet).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
                     @Override
-                    public void onSuccess(Void aVoid) {
+                    public void onSuccess(DocumentReference documentReference) {
                         chooseAlbumArtButton.setTextColor(Color.BLACK);
                         chooseSnippetButton.setTextColor(Color.BLACK);
                         uploadAlbumArtButton.setTextColor(Color.BLACK);

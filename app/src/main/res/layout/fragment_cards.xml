@@ -14,7 +14,7 @@
         android:layout_marginBottom="40dp"
         android:clipChildren="false"
         android:clipToPadding="false"
-        android:padding="20dp"
+        android:padding="32dp"
         app:layout_constraintBottom_toTopOf="@+id/like_button">
 
         <com.yuyakaido.android.cardstackview.CardStackView

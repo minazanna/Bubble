@@ -1,10 +1,13 @@
 package com.bubblestudios.bubble;
 
+import java.util.Date;
+
 public class Snippet {
     private String title;
     private String artist;
     private String snippet;
     private String albumArt;
+    private Date timeStamp;
 
     public Snippet(String title, String artist, String snippet, String albumArt) {
         this.title = title;
@@ -46,4 +49,13 @@ public class Snippet {
     public void setAlbumArt(String albumArt) {
         this.albumArt = albumArt;
     }
+
+    public Date getTimeStamp() {
+        return timeStamp;
+    }
+
+    public void setTimeStamp(Date timeStamp) {
+        this.timeStamp = timeStamp;
+    }
+
 }
