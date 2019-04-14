@@ -18,6 +18,7 @@ import com.google.android.exoplayer2.ui.PlayerView;
 import com.google.android.exoplayer2.upstream.DataSource;
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
 import com.google.android.exoplayer2.util.Util;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
@@ -35,6 +36,7 @@ public class CardsFragment extends Fragment implements CardStackListener {
     private DataSource.Factory dataSourceFactory;
     private PlayerView playerView;
     private CardStackView cardStackView;
+    private DocumentReference snippetRef;
 
     public CardsFragment() {
     }
@@ -70,7 +72,7 @@ public class CardsFragment extends Fragment implements CardStackListener {
         dataSourceFactory = new DefaultDataSourceFactory(getContext(), Util.getUserAgent(getContext(), "Bubble"));
         playerView.setPlayer(exoPlayer);
 
-        Query query = FirebaseFirestore.getInstance().collection("snippets").orderBy("artist");
+        Query query = FirebaseFirestore.getInstance().collection("snippets").orderBy("timeStamp");
         FirestoreRecyclerOptions<Snippet> options = new FirestoreRecyclerOptions.Builder<Snippet>().setQuery(query, Snippet.class).build();
 
         adapter = new CardStackAdapter(options, albumArtRef, snippetRef, exoPlayer, dataSourceFactory, this);
@@ -134,7 +136,7 @@ public class CardsFragment extends Fragment implements CardStackListener {
 
     @Override
     public void onCardSwiped(Direction direction) {
-        Log.d("direction", "onCardSwiped: " + direction.toString());
+        Log.d("direction", "onCardSwiped: " + direction.toString() + " ref: " + snippetRef.getId());
     }
 
     @Override
@@ -160,6 +162,7 @@ public class CardsFragment extends Fragment implements CardStackListener {
         exoPlayer.setPlayWhenReady(false);
         Log.d("disappear", "onCardDisappeared: " + position);
         CardViewHolder viewHolder = (CardViewHolder) cardStackView.findViewHolderForAdapterPosition(position);
+        snippetRef = viewHolder.snippetRef;
     }
 
     public interface OnFragmentInteractionListener {

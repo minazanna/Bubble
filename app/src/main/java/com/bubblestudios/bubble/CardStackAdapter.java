@@ -2,14 +2,13 @@ package com.bubblestudios.bubble;
 
 import android.net.Uri;
 import android.support.annotation.NonNull;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
-import com.firebase.ui.database.FirebaseRecyclerAdapter;
-import com.firebase.ui.database.FirebaseRecyclerOptions;
 import com.firebase.ui.firestore.FirestoreRecyclerAdapter;
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
 import com.google.android.exoplayer2.SimpleExoPlayer;
@@ -43,6 +42,7 @@ public class CardStackAdapter extends FirestoreRecyclerAdapter<Snippet, CardView
         holder.artistName.setText(snippet.getArtist());
         holder.songTitle.setText(snippet.getTitle());
         Glide.with(holder.albumArt).load(albumArtRef.child(snippet.getAlbumArt())).into(holder.albumArt);
+        holder.snippetRef = getSnapshots().getSnapshot(position).getReference();
 
         snippetRef.child(snippet.getSnippet()).getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
             @Override

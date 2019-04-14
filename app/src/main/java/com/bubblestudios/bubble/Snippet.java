@@ -1,5 +1,7 @@
 package com.bubblestudios.bubble;
 
+import com.google.firebase.firestore.ServerTimestamp;
+
 import java.util.Date;
 
 public class Snippet {
@@ -7,7 +9,7 @@ public class Snippet {
     private String artist;
     private String snippet;
     private String albumArt;
-    private Date timeStamp;
+    @ServerTimestamp private Date timeStamp;
 
     public Snippet(String title, String artist, String snippet, String albumArt) {
         this.title = title;
